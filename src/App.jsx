@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { nanoid } from "nanoid";
 
 function App() {
   const [todo, addTodo] = useState("");
@@ -11,15 +12,37 @@ function App() {
 
   const handleButtonClick = (e) => {
     const currentTodoList = [...todoList]
-    currentTodoList.push(todo);
+    currentTodoList.push({
+      id: nanoid(),
+      title: todo,
+      isCompleted: false
+    });
+
     addTodoList(currentTodoList);
     addTodo("")
+  }
+
+  const handleMarkAsCompletedClick = (itemId) => {
+
+    const newList = todoList.map((todoItem) => {
+      let newTodoItem = todoItem
+      if(todoItem.id == itemId){
+        newTodoItem.isCompleted = true
+      }
+      return newTodoItem
+    })
+
+    addTodoList(newList)
+  }
+
+  const hanldeDelete = (itemId) => {
+    addTodoList(todoList.filter((item) => item.id != itemId))
   }
 
   return (
     <>
       <input type='text' value={todo} onChange={handleTodoChange} />
-      <button onClick={handleButtonClick} style={{ marginLeft: 10 }} >Add Todo</button>
+      <button disabled={todo == ""} onClick={handleButtonClick} style={{ marginLeft: 10 }} >Add Todo</button>
       {/* <div>Current value of textbox: {todo}</div>
       <div>Current todoList: {JSON.stringify(todoList)}</div> */}
       <br />
@@ -34,9 +57,13 @@ function App() {
         {todoList.map((todoItem, index) => {
           return <tr>
             <td>{index + 1}</td>
-            <td>{todoItem}</td>
-            <td></td>
-            <td></td>
+            <td>{todoItem.title}</td>
+            <td>{todoItem.isCompleted ? "Completed" : "Not Completed"}</td>
+            <td>
+              {!todoItem.isCompleted &&
+              <button onClick={() => handleMarkAsCompletedClick(todoItem.id)}>Mark as completed</button> }
+              <button onClick={() => hanldeDelete(todoItem.id)}>Delete</button>
+            </td>
           </tr>
         })}
 
