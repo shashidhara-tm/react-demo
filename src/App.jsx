@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import './App.css'
 import { nanoid } from "nanoid";
+import { Button } from './component/Button';
+import { InputField } from './component/InputField';
+import { TodoList } from './component/TodoList';
 
 function App() {
   const [todo, addTodo] = useState("");
@@ -23,16 +26,9 @@ function App() {
   }
 
   const handleMarkAsCompletedClick = (itemId) => {
-
-    const newList = todoList.map((todoItem) => {
-      let newTodoItem = todoItem
-      if(todoItem.id == itemId){
-        newTodoItem.isCompleted = true
-      }
-      return newTodoItem
-    })
-
-    addTodoList(newList)
+    addTodoList(todoList.map((todoItem) =>
+      todoItem.id === itemId ? { ...todoItem, isCompleted: true } : todoItem
+    ))
   }
 
   const hanldeDelete = (itemId) => {
@@ -41,33 +37,15 @@ function App() {
 
   return (
     <>
-      <input type='text' value={todo} onChange={handleTodoChange} />
-      <button disabled={todo == ""} onClick={handleButtonClick} style={{ marginLeft: 10 }} >Add Todo</button>
-      {/* <div>Current value of textbox: {todo}</div>
-      <div>Current todoList: {JSON.stringify(todoList)}</div> */}
+      <InputField testid={"todo-input"} value={todo} onChange={handleTodoChange} />
+      <Button testid="add-todo" label="Add Todo" disabled={todo === ""} onClick={handleButtonClick} />
       <br />
       <br />
-      <table border={1}>
-        <tr>
-          <th>Sl no</th>
-          <th>Todo Title</th>
-          <th>Is Completed</th>
-          <th>Action</th>
-        </tr>
-        {todoList.map((todoItem, index) => {
-          return <tr>
-            <td>{index + 1}</td>
-            <td>{todoItem.title}</td>
-            <td>{todoItem.isCompleted ? "Completed" : "Not Completed"}</td>
-            <td>
-              {!todoItem.isCompleted &&
-              <button onClick={() => handleMarkAsCompletedClick(todoItem.id)}>Mark as completed</button> }
-              <button onClick={() => hanldeDelete(todoItem.id)}>Delete</button>
-            </td>
-          </tr>
-        })}
-
-      </table>
+      <TodoList
+        todoList={todoList}
+        onMarkAsCompleted={handleMarkAsCompletedClick}
+        onDelete={hanldeDelete}
+      />
     </>
   )
 }
